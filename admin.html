@@ -1,3 +1,4 @@
+<!-- Start of admin.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,69 +79,86 @@
     const db = firebase.firestore();
 
     const adminEmail = "admin@sanketh.xyz";
-    let editingId = null; // used for edit mode
+    let editingId = null;
 
-    // 🛡 Check admin access
     auth.onAuthStateChanged(user => {
       if (!user || user.email !== adminEmail) {
         alert("Access denied. Admins only.");
         window.location.href = "login.html";
       } else {
+        console.log("✅ Logged in as admin");
         loadEnrollments();
         loadProducts();
       }
     });
 
-    // ➕ Add or Edit product
     function submitProduct() {
       const type = document.getElementById("itemType").value;
       const title = document.getElementById("itemTitle").value;
       const price = parseInt(document.getElementById("itemPrice").value);
       const razorAmount = price * 100;
 
-      if (!title || !price) {
-        alert("Please enter all fields.");
+      console.log("📤 Submitting:", { type, title, price, razorAmount, editingId });
+
+      if (!title || isNaN(price)) {
+        alert("❌ Please enter valid title and price.");
         return;
       }
 
-      const productData = { type, title, price, razorAmount, updatedAt: new Date() };
+      const productData = {
+        type,
+        title,
+        price,
+        razorAmount,
+        updatedAt: new Date()
+      };
 
       if (editingId) {
-        // Edit mode
-        db.collection("products").doc(editingId).update(productData).then(() => {
-          document.getElementById("addStatus").textContent = "✅ Product updated!";
-          resetForm();
-          loadProducts();
-        });
+        db.collection("products").doc(editingId).update(productData)
+          .then(() => {
+            console.log("✅ Product updated");
+            document.getElementById("addStatus").textContent = "✅ Product updated!";
+            resetForm();
+            loadProducts();
+          })
+          .catch(err => {
+            console.error("❌ Error updating product:", err.message);
+            alert("Error updating: " + err.message);
+          });
       } else {
-        // Add mode
-        db.collection("products").add({ ...productData, createdAt: new Date() }).then(() => {
-          document.getElementById("addStatus").textContent = "✅ Product added!";
-          resetForm();
-          loadProducts();
-        });
+        db.collection("products").add({ ...productData, createdAt: new Date() })
+          .then(() => {
+            console.log("✅ Product added to Firestore");
+            document.getElementById("addStatus").textContent = "✅ Product added!";
+            resetForm();
+            loadProducts();
+          })
+          .catch(err => {
+            console.error("❌ Error adding product:", err.message);
+            alert("Error adding: " + err.message);
+          });
       }
     }
 
-    // 🗂 Load products from Firestore
     function loadProducts() {
       const container = document.getElementById("products");
       container.innerHTML = "";
-      db.collection("products").orderBy("createdAt", "desc").get().then(snapshot => {
-        snapshot.forEach(doc => {
-          const d = doc.data();
-          container.innerHTML += `
-            <div class="course-card">
-              <h4>${d.title}</h4>
-              <p><strong>Type:</strong> ${d.type}</p>
-              <p><strong>Price:</strong> ₹${d.price}</p>
-              <button onclick="editProduct('${doc.id}', '${d.type}', '${d.title}', ${d.price})">Edit</button>
-            </div>`;
-        });
-      });
+      db.collection("products").orderBy("createdAt", "desc").get()
+        .then(snapshot => {
+          snapshot.forEach(doc => {
+            const d = doc.data();
+            container.innerHTML += `
+              <div class="course-card">
+                <h4>${d.title}</h4>
+                <p><strong>Type:</strong> ${d.type}</p>
+                <p><strong>Price:</strong> ₹${d.price}</p>
+                <button onclick="editProduct('${doc.id}', '${d.type}', '${d.title}', ${d.price})">Edit</button>
+              </div>`;
+          });
+        })
+        .catch(err => console.error("❌ Error loading products:", err.message));
     }
 
-    // ✏️ Edit handler
     function editProduct(id, type, title, price) {
       document.getElementById("formTitle").textContent = "Edit Product";
       document.getElementById("submitBtn").textContent = "Update Product";
@@ -150,39 +168,40 @@
       editingId = id;
     }
 
-    // 🧹 Reset form
     function resetForm() {
       editingId = null;
       document.getElementById("formTitle").textContent = "Add Course / Book / Kit";
       document.getElementById("submitBtn").textContent = "Add to Store";
       document.getElementById("itemTitle").value = "";
       document.getElementById("itemPrice").value = "";
+      document.getElementById("addStatus").textContent = "";
     }
 
-    // 👥 Load enrollments
     function loadEnrollments() {
       const container = document.getElementById("enrollments");
-      db.collection("enrollments").orderBy("date", "desc").get().then(snapshot => {
-        if (snapshot.empty) {
-          container.innerHTML = "<p>No enrollments yet.</p>";
-        } else {
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            container.innerHTML += `
-              <div class="course-card">
-                <h3>${data.course}</h3>
-                <p><strong>Email:</strong> ${data.email}</p>
-                <p><strong>Payment ID:</strong> ${data.paymentId}</p>
-                <p><strong>Date:</strong> ${new Date(data.date.toDate()).toLocaleDateString()}</p>
-              </div>`;
-          });
-        }
-      }).catch(error => {
-        container.innerHTML = `<p>Error loading enrollments: ${error.message}</p>`;
-      });
+      db.collection("enrollments").orderBy("date", "desc").get()
+        .then(snapshot => {
+          if (snapshot.empty) {
+            container.innerHTML = "<p>No enrollments yet.</p>";
+          } else {
+            snapshot.forEach(doc => {
+              const data = doc.data();
+              container.innerHTML += `
+                <div class="course-card">
+                  <h3>${data.course}</h3>
+                  <p><strong>Email:</strong> ${data.email}</p>
+                  <p><strong>Payment ID:</strong> ${data.paymentId}</p>
+                  <p><strong>Date:</strong> ${new Date(data.date.toDate()).toLocaleDateString()}</p>
+                </div>`;
+            });
+          }
+        })
+        .catch(error => {
+          console.error("❌ Error loading enrollments:", error.message);
+          container.innerHTML = `<p>Error loading enrollments: ${error.message}</p>`;
+        });
     }
 
-    // 🚪 Logout
     function logout() {
       auth.signOut().then(() => {
         window.location.href = "login.html";
@@ -191,3 +210,4 @@
   </script>
 </body>
 </html>
+<!-- End of admin.html -->
