@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Courses | ElearnIT</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+  <h1>ElearnIT Courses</h1>
+
+  <div class="card-container">
+    <div class="course-card">
+      <h3>Arduino Mastery</h3>
+      <p>₹399 | Learn sensors, LEDs, motors, and projects</p>
+      <button onclick="payNow('Arduino Mastery', 39900)">Buy Now</button>
+    </div>
+    <div class="course-card">
+      <h3>STM32 Programming</h3>
+      <p>₹599 | Embedded C for Cortex MCUs</p>
+      <button onclick="payNow('STM32 Programming', 59900)">Buy Now</button>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCxRo43yRrY_ojKsaio_YFOmgh4TTOAm5Q",
+      authDomain: "sanketh-academy.firebaseapp.com",
+      projectId: "sanketh-academy"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    function payNow(courseName, amount) {
+      const user = auth.currentUser;
+      if (!user) return window.location.href = "login.html";
+
+      const options = {
+        key: "rzp_test_YOURKEYHERE", // Replace with Razorpay key
+        amount: amount,
+        name: "ElearnIT",
+        description: courseName,
+        handler: function (response) {
+          db.collection("enrollments").add({
+            email: user.email,
+            course: courseName,
+            paymentId: response.razorpay_payment_id,
+            date: new Date()
+          }).then(() => {
+            alert("Payment successful!");
+            window.location.href = "student.html";
+          }).catch(e => alert("Error saving: " + e.message));
+        }
+      };
+      new Razorpay(options).open();
+    }
+  </script>
+
+</body>
+</html>

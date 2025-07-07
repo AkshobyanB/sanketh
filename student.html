@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+</head>
+<body>
+  <h1>Your Enrolled Courses</h1>
+  <div id="enrollments" class="card-container"></div>
+  <button onclick="logout()">Logout</button>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCxRo43yRrY_ojKsaio_YFOmgh4TTOAm5Q",
+      authDomain: "sanketh-academy.firebaseapp.com",
+      projectId: "sanketh-academy"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    auth.onAuthStateChanged(user => {
+      if (!user) return location.href = "login.html";
+      db.collection("enrollments").where("email", "==", user.email).get()
+        .then(snapshot => {
+          const container = document.getElementById("enrollments");
+          if (snapshot.empty) {
+            container.innerHTML = "<p>No courses enrolled.</p>";
+          } else {
+            snapshot.forEach(doc => {
+              const data = doc.data();
+              container.innerHTML += `
+                <div class="course-card">
+                  <h3>${data.course}</h3>
+                  <p>Payment ID: ${data.paymentId}</p>
+                  <p>Date: ${new Date(data.date.toDate()).toLocaleDateString()}</p>
+                </div>`;
+            });
+          }
+        });
+    });
+
+    function logout() {
+      auth.signOut().then(() => location.href = "login.html");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | Sanketh Academy</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f4f4; }
+    nav { background-color: #264653; color: white; padding: 15px; display: flex; justify-content: space-between; }
+    nav ul { list-style: none; display: flex; gap: 15px; }
+    nav a { color: white; text-decoration: none; }
+    header { padding: 20px; background: #e9ecef; text-align: center; }
+    .section { padding: 20px; }
+    .card-container { display: flex; flex-wrap: wrap; gap: 15px; padding: 20px; }
+    .course-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 300px; }
+    input, select, button { margin-top: 8px; padding: 10px; width: 100%; margin-bottom: 10px; }
+    button { background-color: #264653; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #1f3e4d; }
+    #addStatus { margin-top: 10px; font-weight: bold; color: green; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <h1>Admin Panel - Sanketh Academy</h1>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="#" onclick="logout()">Logout</a></li>
+    </ul>
+  </nav>
+
+  <header>
+    <h2>All Student Enrollments</h2>
+    <p>Only visible to admin</p>
+  </header>
+
+  <!-- 🔧 Add or Edit Product -->
+  <section class="section" style="background: #fff; border-radius: 10px; margin: 20px;">
+    <h3 id="formTitle">Add Course / Book / Kit</h3>
+    <select id="itemType">
+      <option value="Course">Course</option>
+      <option value="Book">Book</option>
+      <option value="Kit">Kit</option>
+    </select>
+    <input type="text" id="itemTitle" placeholder="Enter title" />
+    <input type="number" id="itemPrice" placeholder="Enter price in ₹" />
+    <button onclick="submitProduct()" id="submitBtn">Add to Store</button>
+    <p id="addStatus"></p>
+  </section>
+
+  <!-- 📦 Product List -->
+  <section class="section" id="productList">
+    <h3>All Store Items</h3>
+    <div class="card-container" id="products"></div>
+  </section>
+
+  <!-- 📦 Enrollments -->
+  <section class="card-container" id="enrollments">
+    <!-- Enrollments will load here -->
+  </section>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCxRo43yRrY_ojKsaio_YFOmgh4TTOAm5Q",
+      authDomain: "sanketh-academy.firebaseapp.com",
+      projectId: "sanketh-academy"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const adminEmail = "admin@sanketh.xyz";
+    let editingId = null; // used for edit mode
+
+    // 🛡 Check admin access
+    auth.onAuthStateChanged(user => {
+      if (!user || user.email !== adminEmail) {
+        alert("Access denied. Admins only.");
+        window.location.href = "login.html";
+      } else {
+        loadEnrollments();
+        loadProducts();
+      }
+    });
+
+    // ➕ Add or Edit product
+    function submitProduct() {
+      const type = document.getElementById("itemType").value;
+      const title = document.getElementById("itemTitle").value;
+      const price = parseInt(document.getElementById("itemPrice").value);
+      const razorAmount = price * 100;
+
+      if (!title || !price) {
+        alert("Please enter all fields.");
+        return;
+      }
+
+      const productData = { type, title, price, razorAmount, updatedAt: new Date() };
+
+      if (editingId) {
+        // Edit mode
+        db.collection("products").doc(editingId).update(productData).then(() => {
+          document.getElementById("addStatus").textContent = "✅ Product updated!";
+          resetForm();
+          loadProducts();
+        });
+      } else {
+        // Add mode
+        db.collection("products").add({ ...productData, createdAt: new Date() }).then(() => {
+          document.getElementById("addStatus").textContent = "✅ Product added!";
+          resetForm();
+          loadProducts();
+        });
+      }
+    }
+
+    // 🗂 Load products from Firestore
+    function loadProducts() {
+      const container = document.getElementById("products");
+      container.innerHTML = "";
+      db.collection("products").orderBy("createdAt", "desc").get().then(snapshot => {
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          container.innerHTML += `
+            <div class="course-card">
+              <h4>${d.title}</h4>
+              <p><strong>Type:</strong> ${d.type}</p>
+              <p><strong>Price:</strong> ₹${d.price}</p>
+              <button onclick="editProduct('${doc.id}', '${d.type}', '${d.title}', ${d.price})">Edit</button>
+            </div>`;
+        });
+      });
+    }
+
+    // ✏️ Edit handler
+    function editProduct(id, type, title, price) {
+      document.getElementById("formTitle").textContent = "Edit Product";
+      document.getElementById("submitBtn").textContent = "Update Product";
+      document.getElementById("itemType").value = type;
+      document.getElementById("itemTitle").value = title;
+      document.getElementById("itemPrice").value = price;
+      editingId = id;
+    }
+
+    // 🧹 Reset form
+    function resetForm() {
+      editingId = null;
+      document.getElementById("formTitle").textContent = "Add Course / Book / Kit";
+      document.getElementById("submitBtn").textContent = "Add to Store";
+      document.getElementById("itemTitle").value = "";
+      document.getElementById("itemPrice").value = "";
+    }
+
+    // 👥 Load enrollments
+    function loadEnrollments() {
+      const container = document.getElementById("enrollments");
+      db.collection("enrollments").orderBy("date", "desc").get().then(snapshot => {
+        if (snapshot.empty) {
+          container.innerHTML = "<p>No enrollments yet.</p>";
+        } else {
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            container.innerHTML += `
+              <div class="course-card">
+                <h3>${data.course}</h3>
+                <p><strong>Email:</strong> ${data.email}</p>
+                <p><strong>Payment ID:</strong> ${data.paymentId}</p>
+                <p><strong>Date:</strong> ${new Date(data.date.toDate()).toLocaleDateString()}</p>
+              </div>`;
+          });
+        }
+      }).catch(error => {
+        container.innerHTML = `<p>Error loading enrollments: ${error.message}</p>`;
+      });
+    }
+
+    // 🚪 Logout
+    function logout() {
+      auth.signOut().then(() => {
+        window.location.href = "login.html";
+      });
+    }
+  </script>
+</body>
+</html>

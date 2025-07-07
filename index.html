@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SANKETH Academy</title>
+  <style>
+    :root {
+      --primary-color: #0059b3;
+      --secondary-color: #0073e6;
+      --text-color: #003366;
+      --bg-light: #e6f0ff;
+      --white: #fff;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background-color: var(--bg-light);
+      color: var(--text-color);
+    }
+
+    nav {
+      background-color: var(--primary-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      color: white;
+    }
+
+    nav h1 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+
+    nav ul li a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav ul li a:hover {
+      text-decoration: underline;
+    }
+
+    header, section {
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    header {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .event-card, .project-card, .course-card {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 20px;
+      margin: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 300px;
+      transition: transform 0.3s ease;
+    }
+
+    .event-card:hover, .project-card:hover, .course-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .register-btn {
+      background-color: var(--secondary-color);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .gallery {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding: 10px;
+      justify-content: center;
+      scroll-snap-type: x mandatory;
+    }
+
+    .gallery img {
+      height: 200px;
+      border-radius: 10px;
+      scroll-snap-align: start;
+    }
+
+    .social-icons img {
+      width: 40px;
+      margin: 10px;
+    }
+
+    .section-title {
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      font-size: 2em;
+    }
+
+    footer {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      nav ul {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+  <h1>ElearnIT</h1>
+  <ul>
+    <li><a href="#events">Events</a></li>
+    <li><a href="#mission">Mission</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#contact">Community</a></li>
+    <li><a href="courses.html">Courses</a></li>
+    <li><a href="books.html">Books</a></li>
+    <li><a href="kits.html">Kits</a></li>
+    <li><a href="login.html" class="login-btn">Login</a></li>
+  </ul>
+</nav>
+
+  <!-- HEADER -->
+<header style="display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;">
+  <a href="index.html">
+    <img src="https://i.ibb.co/chj5gmjk/1.png" alt="ElearnIT Logo" style="height: 100px; max-width: 100%; border-radius: 10px;">
+  </a>
+  <div>
+    <h1>Welcome to SANKETH Academy</h1>
+    <p>Empowering knowledge through digital learning.</p>
+  </div>
+</header>
+
+
+
+  <!-- EVENTS SECTION -->
+  <section id="events">
+    <h2 class="section-title">Upcoming Events</h2>
+    <div class="card-container">
+      <div class="event-card">
+        <h3>Arduino Bootcamp</h3>
+        <p>Starts July 1st – 5 Days Online Hands-on</p>
+        <a href="https://forms.gle/QFqbQCsHRum3HfoJ8" class="register-btn" target="_blank">Register</a>
+      </div>
+      <div class="event-card">
+        <h3>Python for Beginners</h3>
+        <p>Starts July 10th – Free Certificate</p>
+        <a href="https://forms.gle/QFqbQCsHRum3HfoJ8" class="register-btn" target="_blank">Register</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MISSION -->
+  <section id="mission">
+    <h2 class="section-title">Our Mission</h2>
+    <p>To provide high-quality, affordable, and accessible education to every aspiring learner.<br>
+      We believe in practical learning, innovation, and collaboration to shape future technocrats.</p>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery">
+    <h2 class="section-title">Gallery</h2>
+    <div class="gallery">
+      <!-- Images should be in GitHub repo inside /gallery folder -->
+      <a href="https://ibb.co/WvL9xTLG"><img src="https://i.ibb.co/chj5gmjk/1.png" alt="1" border="0"></a>
+    </div>
+  </section>
+
+  <!-- COMMUNITY -->
+  <section id="contact">
+    <h2 class="section-title">Join Our Community</h2>
+    <div class="social-icons">
+      <a href="https://whatsapp.com/channel/0029VbAZ5dIJpe8YqQzMIx1e"><img src="https://img.icons8.com/ios-filled/50/0059b3/whatsapp.png" alt="WhatsApp" /></a>
+      <a href="https://www.instagram.com/e_learn_it/"><img src="https://img.icons8.com/ios-filled/50/0059b3/instagram-new.png" alt="Instagram" /></a>
+    </div>
+
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <h2 class="section-title">Our Projects</h2>
+    <div class="card-container">
+      <div class="project-card">
+        <h3>Smart Dustbin</h3>
+        <p>Sensor-based automatic lid – Arduino + Ultrasonic</p>
+      </div>
+      <div class="project-card">
+        <h3>Weather Station</h3>
+        <p>Live temperature, humidity using DHT11 + OLED</p>
+      </div>
+      <div class="project-card">
+        <h3>Line Follower Robot</h3>
+        <p>IR Sensor, L298N Motor Driver, Arduino Uno</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© SANKETH Academy | Designed with 💙</p>
+  </footer>
+<div style="text-align: center; margin-top: 30px;">
+  <img src="founder.png" alt="Founder" style="width:200px; border-radius: 10px;">
+  <h3 style="margin-top: 10px;">Mr.Akshobyan Bhaskar</h3>
+  <p>Founder & CEO<br>SANKETH Academy<br>BTech ECE</p>
+</div>
+
+</body>
+</html>

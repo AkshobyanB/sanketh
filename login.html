@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login | Sanketh Academy</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #f2f4f7;
+      display: flex;
+      height: 100vh;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      display: flex;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      max-width: 800px;
+      width: 100%;
+    }
+
+    .left {
+      background: #264653;
+      color: white;
+      padding: 30px;
+      text-align: center;
+      flex: 1;
+    }
+
+    .left img {
+      width: 120px;
+      margin-bottom: 20px;
+    }
+
+    .left h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .right {
+      padding: 40px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .right h1 {
+      margin-bottom: 20px;
+      color: #264653;
+    }
+
+    .right input {
+      margin-bottom: 15px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      width: 100%;
+    }
+
+    .right button {
+      padding: 12px;
+      font-size: 16px;
+      margin-top: 10px;
+      border: none;
+      background: #264653;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .right button:hover {
+      background: #1e3845;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+      .left, .right {
+        padding: 20px;
+      }
+    }
+  </style>
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <div class="left">
+      <a href="https://ibb.co/WvL9xTLG">
+        <img src="https://i.ibb.co/chj5gmjk/1.png" alt="Sanketh Logo">
+      </a>
+      <h2>Sanketh Academy</h2>
+      <p>Empowering students through Embedded Learning</p>
+    </div>
+    <div class="right">
+      <h1>Login / Register</h1>
+      <input type="email" id="email" placeholder="Enter your email" />
+      <input type="password" id="password" placeholder="Enter password" />
+      <button onclick="login()">Login</button>
+      <button onclick="register()">Register</button>
+    </div>
+  </div>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCxRo43yRrY_ojKsaio_YFOmgh4TTOAm5Q",
+      authDomain: "sanketh-academy.firebaseapp.com",
+      projectId: "sanketh-academy"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const adminEmail = "admin@sanketh.xyz";
+
+    function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          if (email === adminEmail) {
+            window.location.href = "admin.html";
+          } else {
+            window.location.href = "student.html";
+          }
+        })
+        .catch(e => alert("Login error: " + e.message));
+    }
+
+    function register() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => alert("Registered successfully! Now login."))
+        .catch(e => alert("Registration error: " + e.message));
+    }
+  </script>
+
+</body>
+</html>
